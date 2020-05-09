@@ -99,7 +99,7 @@ model.compile(optimizer='adam',
 
 
 
-history = model.fit(x_train, y_train, epochs=10, batch_size=batchSize, validation_data=(x_val, y_val))
+history = model.fit(x_train, y_train, epochs=epochs, batch_size=batchSize, validation_data=(x_val, y_val))
 
 
 
