@@ -1,4 +1,3 @@
-# TrafficSignClassification
-CNN in Tensorflow 2 to categorize traffic signs
+# TrafficSignClassification (Björn Bulkens, Miriam Lorenz, Daniel Fauland)
 ## Master Branch
-### Björn Bulkens, Miriam Lorenz, Daniel Fauland
+
