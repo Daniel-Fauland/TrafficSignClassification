@@ -6,5 +6,5 @@ augment.augmentData()
 
 
 # --- Run this code to delete the augmented images (comment out the above code before running this) ---
-augment = AugmentImages()
-augment.delAugmentedImages()
+# augment = AugmentImages()
+# augment.delAugmentedImages()

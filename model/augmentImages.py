@@ -20,6 +20,7 @@ class AugmentImages():
             for file in folder:
                 # --- read image + save augmented image ---
                 srcImage = cv2.imread(self.path + "/" + str(count) + "/" + file)
+                augmentedImageRotation = tf.image.rot90(srcImage, k=2)
                 augmentedImageLeftRight = tf.image.random_flip_left_right(srcImage)
                 augmentedImageUpDown = tf.image.random_flip_up_down(srcImage)
                 augmentedImageHue = tf.image.random_hue(srcImage, 0.08)
@@ -27,6 +28,7 @@ class AugmentImages():
                 augmentedImageBrightness = tf.image.random_brightness(srcImage, 0.05)
                 augmentedImageContrast = tf.image.random_contrast(srcImage, 0.7, 1.3)
 
+                cv2.imwrite(self.path + "/" + str(count) + "/" + "augRotation_" + file, np.float32(augmentedImageRotation))
                 cv2.imwrite(self.path + "/" + str(count) + "/" + "augLeftRight_" + file, np.float32(augmentedImageLeftRight))
                 cv2.imwrite(self.path + "/" + str(count) + "/" + "augUpDown_" + file, np.float32(augmentedImageUpDown))
                 cv2.imwrite(self.path + "/" + str(count) + "/" + "augHue_" + file, np.float32(augmentedImageHue))
