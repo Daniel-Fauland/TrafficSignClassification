@@ -4,12 +4,16 @@ from tensorflow import keras
 from tensorflow.keras import layers, models
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 import cv2
 from sklearn.model_selection import train_test_split  # function to split the data very easy
 
 
 class Model():
     def __init__(self, parameters=None):
+        # --- Do not use unless you have problems running TF2 with gpu ---
+        # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'  # force CPU Usage, instead of GPU
+
         # --- prevent TF from using more VRAM than the GPU actually has ---
         gpus = tf.config.experimental.list_physical_devices('GPU')
         if gpus:
@@ -18,9 +22,6 @@ class Model():
                     tf.config.experimental.set_memory_growth(gpu, True)
             except RuntimeError as e:
                 print(e)
-
-        # --- Do not use unless you have problems running TF2 with gpu ---
-        # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'  # force CPU Usage, instead of GPU
 
         # --- parameters ---
         self.path = "../trainingData"
@@ -56,29 +57,46 @@ class Model():
 
 
     # =================================
-    def preprocessData(self, x_train, x_val, y_train, y_val):
+    def preprocessData(self, x_train, x_val=None, y_train=None, y_val=None):
         # --- normalize images ---
-        def normalize(img):
-            img = cv2.cvtColor(np.float32(img), cv2.COLOR_BGR2GRAY)  # Grayscale image
-            # img = cv2.equalizeHist(np.uint8(img))                    # Optimize Lightning
-            img = img / 255.0                                        # Normalize px values between 0 and 1
-            return img
+        if x_val is None and y_train is None and y_val is None:
+            # --- This is to pre-process realData ---
+            def normalize(img):
+                img = cv2.cvtColor(np.float32(img), cv2.COLOR_BGR2GRAY)    # Grayscale image
+                # img = cv2.equalizeHist(np.uint8(img))                    # Optimize Lightning
+                img = img / 255.0                                          # Normalize px values between 0 and 1
+                return img
 
-        for x in range(len(x_train)):
-            x_train[x] = normalize(x_train[x])
+            for x in range(len(x_train)):
+                x_train[x] = normalize(x_train[x])
 
-        for x in range(len(x_val)):
-            x_val[x] = normalize(x_val[x])
+            x_train = np.array(x_train)
+            x_train = x_train.reshape(x_train.shape[0], x_train.shape[1], x_train.shape[2], 1)
+            return x_train
 
-        # --- transform the data to be accepted by the model ---
-        y_train = np.array(y_train)
-        y_val = np.array(y_val)
-        x_train = np.array(x_train)
-        x_val = np.array(x_val)
-        x_train = x_train.reshape(x_train.shape[0], x_train.shape[1], x_train.shape[2], 1)
-        x_val = x_val.reshape(x_val.shape[0], x_val.shape[1], x_val.shape[2], 1)
-        print("preprocessing data done.")
-        return x_train, x_val, y_train, y_val
+        else:
+            # --- This is to pre-process the training data
+            def normalize(img):
+                img = cv2.cvtColor(np.float32(img), cv2.COLOR_BGR2GRAY)  # Grayscale image
+                # img = cv2.equalizeHist(np.uint8(img))                  # Optimize Lightning
+                img = img / 255.0                                        # Normalize px values between 0 and 1
+                return img
+
+            for x in range(len(x_train)):
+                x_train[x] = normalize(x_train[x])
+
+            for x in range(len(x_val)):
+                x_val[x] = normalize(x_val[x])
+
+            # --- transform the data to be accepted by the model ---
+            y_train = np.array(y_train)
+            y_val = np.array(y_val)
+            x_train = np.array(x_train)
+            x_val = np.array(x_val)
+            x_train = x_train.reshape(x_train.shape[0], x_train.shape[1], x_train.shape[2], 1)
+            x_val = x_val.reshape(x_val.shape[0], x_val.shape[1], x_val.shape[2], 1)
+            print("preprocessing data done.")
+            return x_train, x_val, y_train, y_val
 
 
     # =================================
@@ -162,8 +180,66 @@ class Model():
 
 
     # =================================
+    def evaluateRealData(self, labelNames, imagePath):
+        srcImg, resImg = self.resizeImage(imagePath)
+        print(srcImg)
+        # self.showImage(srcImg)
+        # self.showImage(resImg)
+        resImg = self.preprocessData(resImg)
+        prediction = self.loadModel(resImg)
+
+        # for i in range(len(resImg)):
+        #     img = np.array(resImg[i] * 255, dtype=np.uint8)
+        #     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        #     plt.imshow(img)
+        #     plt.show()
+
+        for i in range(len(srcImg)):
+            image = plt.imread(srcImg[i])
+            plt.imshow(image)
+            plt.title("Prediction: " + labelNames[np.argmax(prediction[i])])
+            # plt.title("Prediction: " + labelNames[np.argmax(prediction[i])] +
+            #           " with probability of " + str(np.amax(prediction[i])))
+            plt.show()
+
+
+    # =================================
+    def resizeImage(self, imagePath):
+        # --- Iterates over each file in a folder and resizes it to 32x32 px and appends it to a list ---
+        folder = os.listdir(imagePath)
+        dim = (32, 32)
+        srcImg, resImg = [], []
+
+        for file in folder:
+            singleImage = cv2.imread(imagePath + "/" + file)
+            resizedImage = cv2.resize(singleImage, dim)
+            cv2.imwrite("../../resizedImages/272727" + file, np.float32(resizedImage))
+            srcImg.append(imagePath + "/" + file)
+            resImg.append(resizedImage)
+        return srcImg, resImg
+
+
+    # =================================
     def showImage(self, img):
-        # --- this function shows any image that gets passed to it ---
-        cv2.imshow('image', img)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        # --- this function shows any image that gets passed to it regarding the type or shape ---
+        if isinstance(img, list):
+            if isinstance(img[0], str):
+                for i in range(len(img)):
+                    image = plt.imread(img[i])
+                    plt.imshow(image)
+                    plt.show()
+            else:
+                for i in range(len(img)):
+                    cv2.imshow('image', img[i])
+                    cv2.waitKey(0)
+                    cv2.destroyAllWindows()
+
+        else:
+            if isinstance(img, str):
+                image = plt.imread(img)
+                plt.imshow(image)
+                plt.show()
+            else:
+                cv2.imshow('image', img)
+                cv2.waitKey(0)
+                cv2.destroyAllWindows()
