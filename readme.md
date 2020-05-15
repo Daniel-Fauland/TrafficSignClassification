@@ -12,8 +12,8 @@
 ### Get the training data
 - To reduce the size of the GitHub repo the training data has to be downloaded separately
 - Download the data from [Google Drive](https://drive.google.com/open?id=1B8ZRGXy273lBVUbva_xclOld-7sKPt3q)
-- The zip file contains the folder 'trainingData'
-- Make sure the replace the empty 'trainingData' folder in the project with the folder from the downloaded zip file
+- Extract the folder 'trainingData' to the main project directory
+
 
 
 ### Train the model yourself
