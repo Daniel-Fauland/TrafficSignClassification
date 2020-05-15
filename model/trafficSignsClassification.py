@@ -4,7 +4,6 @@ from tensorflow import keras
 from tensorflow.keras import layers, models
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 import cv2
 from sklearn.model_selection import train_test_split  # function to split the data very easy
 
@@ -106,8 +105,6 @@ class Model():
         model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(32, 32, 1)))
         model.add(layers.MaxPooling2D((2, 2)))
         model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-        # model.add(layers.MaxPooling2D((2, 2)))
-        # model.add(layers.Conv2D(64, (3, 3), activation='relu'))
 
         model.add(layers.Flatten())
         model.add(layers.Dropout(0.2))
@@ -182,24 +179,13 @@ class Model():
     # =================================
     def evaluateRealData(self, labelNames, imagePath):
         srcImg, resImg = self.resizeImage(imagePath)
-        print(srcImg)
-        # self.showImage(srcImg)
-        # self.showImage(resImg)
         resImg = self.preprocessData(resImg)
         prediction = self.loadModel(resImg)
-
-        # for i in range(len(resImg)):
-        #     img = np.array(resImg[i] * 255, dtype=np.uint8)
-        #     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        #     plt.imshow(img)
-        #     plt.show()
 
         for i in range(len(srcImg)):
             image = plt.imread(srcImg[i])
             plt.imshow(image)
             plt.title("Prediction: " + labelNames[np.argmax(prediction[i])])
-            # plt.title("Prediction: " + labelNames[np.argmax(prediction[i])] +
-            #           " with probability of " + str(np.amax(prediction[i])))
             plt.show()
 
 
@@ -213,33 +199,7 @@ class Model():
         for file in folder:
             singleImage = cv2.imread(imagePath + "/" + file)
             resizedImage = cv2.resize(singleImage, dim)
-            cv2.imwrite("../../resizedImages/272727" + file, np.float32(resizedImage))
             srcImg.append(imagePath + "/" + file)
             resImg.append(resizedImage)
         return srcImg, resImg
 
-
-    # =================================
-    def showImage(self, img):
-        # --- this function shows any image that gets passed to it regarding the type or shape ---
-        if isinstance(img, list):
-            if isinstance(img[0], str):
-                for i in range(len(img)):
-                    image = plt.imread(img[i])
-                    plt.imshow(image)
-                    plt.show()
-            else:
-                for i in range(len(img)):
-                    cv2.imshow('image', img[i])
-                    cv2.waitKey(0)
-                    cv2.destroyAllWindows()
-
-        else:
-            if isinstance(img, str):
-                image = plt.imread(img)
-                plt.imshow(image)
-                plt.show()
-            else:
-                cv2.imshow('image', img)
-                cv2.waitKey(0)
-                cv2.destroyAllWindows()
