@@ -20,6 +20,7 @@
 - **Note**: Make sure you have at least 16GB of Ram installed or the program will crash during training!
 - If you want to train the model yourself you should run the 'createAugmentedImages' file in the 'run' folder first 
 (This will take several minutes)
+    - In Case of error "no modul named 'model' found" use from '.model.augmentImages import AugmentImages' as relative import path (since python 2.5)
 - Then you can run the 'trainModel' file in the same directory (This process can take very long without a GPU!)
 - After the training is complete you can see the accuracy and validation accuracy in a graph as well as the optimal 
 amount of epochs for the validation accuracy
