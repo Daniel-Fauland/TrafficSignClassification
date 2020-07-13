@@ -1,4 +1,5 @@
 import os
+import sys
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers, models
@@ -202,4 +203,38 @@ class Model():
             srcImg.append(imagePath + "/" + file)
             resImg.append(resizedImage)
         return srcImg, resImg
+
+
+    # =================================
+    ### Just for the paper
+    def confusionMatrix(self):
+        # --- loads data, prepossess data, loads model, makes predictions on validation data ---
+        print("initializing...")
+        x_train, x_val, y_train, y_val = self.loadData()
+        x_train, x_val, y_train, y_val = self.preprocessData(x_train, x_val, y_train, y_val)
+        prediction = self.loadModel(x_val)
+
+        pred = []
+        for i in range(len(prediction)):
+            pred.append(np.argmax(prediction[i]))
+
+        np.set_printoptions(threshold=sys.maxsize)
+        # --- builds a confusion matrix from the wrong predictions ---
+        matrix = tf.math.confusion_matrix(y_val, pred)
+        matrix = np.matrix(matrix)  # Matrix function to make the output better to read
+        print(matrix)
+
+        # --- Change output format to txt file because python can't print enough lines ---
+        original_stdout = sys.stdout  # Save a reference to the original standard output
+        with open('matrix.txt', 'w') as f:
+            sys.stdout = f  # Change the standard output to the file we created.
+            print(matrix)
+            sys.stdout = original_stdout  # Reset the standard output to its original value
+
+
+
+
+
+
+
 
