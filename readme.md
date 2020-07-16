@@ -1,4 +1,7 @@
 ## TrafficSignClassification (Björn Bulkens, Miriam Lorenz, Daniel Fauland)
+### Aim of the project
+The aim of the project is the implementation of a picture classification model for traffic signs. It's simultaneously necessary for the model to be accurate, fast and as light as possible since the Use Case requires the environment to work with a low level of computing power.
+
 ### Requirements
 - Necessary packages can be found in 'requirements.txt'
 - If you do not have a NVIDIA GPU install TF2 via this command: 'pip install tensorflow'
