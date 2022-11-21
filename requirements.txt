@@ -2,7 +2,7 @@ keras
 pandas
 numpy
 matplotlib
-tensorflow-gpu==2.1.0
+tensorflow-gpu==2.9.3
 opencv-python
 scikit-learn
 
